@@ -4,9 +4,24 @@ require 'tty-prompt'
 require 'json'
 require 'nokogiri'
 
+def parse_html(raw)
+	def parse_nodes(nodes)
+		nodes&.map do |node|
+			{
+				name: node.name,
+				text: node.text,
+				#attributes: node.attributes,
+				children: parse_nodes(node.children)
+			}
+		end
+	end
+
+	return parse_nodes(Nokogiri::HTML(raw).css('*'))
+end
+
 parsers = {
 	json: lambda {|raw| JSON.parse(raw)},
-	html: lambda {|raw| Nokogiri::HTML(raw)}
+	html: lambda {|raw| parse_html(raw)}
 }
 
 
@@ -20,7 +35,7 @@ loop do
 	loop do 
 		case mode
 		when :url
-			url = prompt.ask('url:')
+			url = 'https://example.com' #prompt.ask('url:')
 			raw = URI.open(url)
 		when :data
 			raw = prompt.multiline("#{parser}:").join
@@ -31,13 +46,15 @@ loop do
 			data = parse.call(raw)
 		rescue
 			prompt.error('Failed to parse data.')
-			next
+			raise
+			#next
 		else
 			prompt.ok('Parsed data.')
 			pp data
 		end
-
+		break
 	end
+	break
 end
 
 
