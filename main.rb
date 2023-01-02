@@ -1,29 +1,16 @@
 require 'open-uri'
 require 'tty-prompt'
+require 'awesome_print'
 
 require 'json'
 require 'nokogiri'
+require 'xml/to/hash'
 
-def parse_html(raw)
-	def parse_nodes(nodes)
-		nodes&.map do |node|
-			{
-				name: node.name,
-				text: node.text,
-				#attributes: node.attributes,
-				children: parse_nodes(node.children)
-			}
-		end
-	end
-
-	return parse_nodes(Nokogiri::HTML(raw).css('*'))
-end
 
 parsers = {
 	json: lambda {|raw| JSON.parse(raw)},
-	html: lambda {|raw| parse_html(raw)}
+	html: lambda {|raw| Nokogiri::HTML(raw).to_hash }
 }
-
 
 prompt = TTY::Prompt.new
 
@@ -50,7 +37,7 @@ loop do
 			#next
 		else
 			prompt.ok('Parsed data.')
-			pp data
+			ap data
 		end
 		break
 	end
