@@ -10,7 +10,7 @@ require 'xml/to/hash'
 
 parsers = {
 	json: lambda {|raw| JSON.parse(raw)},
-	html: lambda {|raw| Nokogiri::HTML(raw).to_hash }
+	html: lambda {|raw| Nokogiri::HTML(raw).to_hash}
 }
 
 prompt = TTY::Prompt.new
