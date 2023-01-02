@@ -22,8 +22,15 @@ loop do
 	loop do 
 		case mode
 		when :url
-			url = 'https://example.com' #prompt.ask('url:')
-			raw = URI.open(url)
+			url = prompt.ask('url:')
+			begin
+				raw = URI.open(url)
+			rescue
+				prompt.error('Failed to access link.')
+				next
+			else
+				prompt.ok('Accessed link.')
+			end
 		when :data
 			raw = prompt.multiline("#{parser}:").join
 		end
@@ -33,8 +40,8 @@ loop do
 			data = parse.call(raw)
 		rescue
 			prompt.error('Failed to parse data.')
-			raise
-			#next
+			#raise
+			next
 		else
 			prompt.ok('Parsed data.')
 			ap data
