@@ -63,9 +63,21 @@ loop do
 		nodes = []
 		context = curr.class
 		if context == Array
-			nodes = curr
+			index = 0
+			nodes = curr.map do |elem|
+				index += 1
+				{
+					name: "#{index} - #{elem&.class}",
+					value: elem
+				}
+			end
 		elsif context == Hash
-			nodes = curr.keys
+			nodes = curr.to_a.map do |key, value|
+				{
+					name: "#{key} - #{value&.class}",
+					value: value
+				}
+			end
 		end
 
 		header = "Level #{stack.length} - #{context}"
@@ -77,26 +89,34 @@ loop do
 		opts << :back unless root
 		opts << :menu
 
-		action = prompt.select("#{header} | Node", opts)
+		action = prompt.select("#{header} | Node", opts, cycle: true)
 		system 'clear'
 
 		case action
 		when :select
-			node = prompt.select("#{header} | Select", nodes)
+			node = prompt.select("#{header} | Select", nodes, cycle: true, per_page: 10)
 			system 'clear'
-			stack.push curr
-			curr = node
+
+			if [Array, Hash].include? node.class
+				stack.push curr
+				curr = node
+			else
+				prompt.say("#{header} | Select -> #{node.class}")
+				ap node
+				prompt.keypress("Press any key to continue...")
+				system 'clear'
+			end
 		when :back
 			curr = stack.pop
 		when :menu
-			commands = [:resume, :new, :exit]
+			commands = [:continue, :load, :exit]
 			command = prompt.select("#{header} | Menu", commands)
 			system 'clear'
 
 			case command
-			when :resume
+			when :continue
 				next
-			when :new
+			when :load
 				break
 			when :exit
 				exit
