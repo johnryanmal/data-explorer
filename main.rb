@@ -25,7 +25,7 @@ loop do
 	loop do 
 		case mode
 		when :url
-			url = prompt.ask('url:')
+			url = "https://example.com"#prompt.ask('url:')
 			begin
 				raw = URI.open(url)
 			rescue
@@ -51,13 +51,44 @@ loop do
 	end
 
 	# explore data
-	# TODO: make this
 	# TODO: sanitize strings in html content with str.dump
-	# TODO: display top level data, hide lower levels
-	ap data
 
-	#test = {a:1,b:2,c:3}
-	puts TTY::Tree.new(data).render
+	stack = []
+	curr = data
+
+	loop do
+		nodes = []
+		context = curr.class
+		if context == Array
+			nodes = curr
+		elsif context == Hash
+			nodes = curr.keys
+		end
+
+		leaf = nodes.empty?
+		root = stack.empty?
+		opts = []
+		opts.push :select unless leaf
+		opts.push :back unless root
+
+		action = prompt.select("Level #{stack.length} | #{context} <-", opts)
+		system 'clear'
+
+		case action
+		when :select
+			node = prompt.select("Level #{stack.length} | #{context} ->", nodes)
+			system 'clear'
+			stack.push curr
+			curr = node
+		when :back
+			curr = stack.pop
+		end
+	end
+
+	# ap data
+
+	# test = {a:1,b:2,c:3}
+	
 
 	break
 end
