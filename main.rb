@@ -68,14 +68,16 @@ loop do
 				index += 1
 				{
 					name: "#{index} - #{elem&.class}",
-					value: elem
+					value: [elem, index]
 				}
 			end
 		elsif context == Hash
+			index = 0
 			nodes = curr.to_a.map do |key, value|
+				index += 1
 				{
 					name: "#{key} - #{value&.class}",
-					value: value
+					value: [value, index]
 				}
 			end
 		end
@@ -94,8 +96,9 @@ loop do
 
 		case action
 		when :select
+			cursor = 1
 			loop do
-				node = prompt.select("#{header} | Select", nodes, cycle: true, per_page: 10)
+				node, cursor = prompt.select("#{header} | Select", nodes, default: cursor, cycle: true, per_page: 10)
 				system 'clear'
 
 				if [Array, Hash].include? node.class
@@ -105,7 +108,7 @@ loop do
 				else
 					prompt.say("#{header} | Select -> #{node.class}")
 					ap node
-					prompt.say
+					prompt.say("\n")
 					command = prompt.select('Continue?', [:select, :back])
 					system 'clear'
 
