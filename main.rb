@@ -131,8 +131,8 @@ loop do
 				end
 
 				commands = []
+				commands << :unselect
 				commands << :select if [Array, Hash].include? node.class
-				commands << :reselect
 				commands << :pager if truncated
 				commands << :back
 				command_opts = choices(options(commands))
@@ -156,12 +156,12 @@ loop do
 				end
 
 				case command
+				when :unselect
+					next
 				when :select
 					stack.push curr
 					curr = node
 					break
-				when :reselect
-					next
 				when :back
 					break
 				end
