@@ -20,3 +20,10 @@ After restarting your shell, you can now use the command:
 ```shell
 cli-data-explorer
 ```
+
+## Updating
+
+Pull from the repository:
+```
+git -C ~/.173-tools/repos/data-explorer pull https://github.com/johnryanmal/data-explorer
+```
