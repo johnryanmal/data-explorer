@@ -94,23 +94,33 @@ loop do
 
 		case action
 		when :select
-			node = prompt.select("#{header} | Select", nodes, cycle: true, per_page: 10)
-			system 'clear'
-
-			if [Array, Hash].include? node.class
-				stack.push curr
-				curr = node
-			else
-				prompt.say("#{header} | Select -> #{node.class}")
-				ap node
-				prompt.keypress("Press any key to continue...")
+			loop do
+				node = prompt.select("#{header} | Select", nodes, cycle: true, per_page: 10)
 				system 'clear'
+
+				if [Array, Hash].include? node.class
+					stack.push curr
+					curr = node
+					break
+				else
+					prompt.say("#{header} | Select -> #{node.class}")
+					ap node
+					prompt.say
+					command = prompt.select('Continue?', [:select, :back])
+					system 'clear'
+
+					case command
+					when :select
+						next
+					when :back
+						break
+					end
+				end
 			end
 		when :back
 			curr = stack.pop
 		when :menu
-			commands = [:continue, :load, :exit]
-			command = prompt.select("#{header} | Menu", commands)
+			command = prompt.select("#{header} | Menu", [:continue, :load, :exit])
 			system 'clear'
 
 			case command
