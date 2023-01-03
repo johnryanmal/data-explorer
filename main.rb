@@ -9,6 +9,24 @@ require 'nokogiri'
 require 'xml/to/hash'
 
 
+def options(array)
+	return array.map do |value|
+		{
+			name: value,
+			value: value
+		}
+	end
+end
+
+def choices(array)
+	index = 0
+	return array.map do |option|
+		index += 1
+		next option.merge({value: [option[:value], index]})
+	end
+end
+
+
 parsers = {
 	json: lambda {|raw| JSON.parse(raw)},
 	html: lambda {|raw| Nokogiri::HTML(raw).to_hash}
@@ -70,19 +88,18 @@ loop do
 				index += 1
 				{
 					name: "#{index} - #{elem&.class}",
-					value: [elem, index]
+					value: elem
 				}
 			end
 		elsif context == Hash
-			index = 0
 			nodes = curr.to_a.map do |key, value|
-				index += 1
 				{
 					name: "#{key} - #{value&.class}",
-					value: [value, index]
+					value: value
 				}
 			end
 		end
+		node_opts = choices(nodes)
 
 		header = "Level #{stack.length} - #{context}"
 
@@ -98,9 +115,9 @@ loop do
 
 		case action
 		when :select
-			cursor = 1
+			select_cursor = 1
 			loop do
-				node, cursor = prompt.select("#{header} | Select", nodes, default: cursor, cycle: true, per_page: 10)
+				node, select_cursor = prompt.select("#{header} | Select", node_opts, default: select_cursor, cycle: true, per_page: 10)
 				system 'clear'
 
 				view = (node.class == String)? node : node.ai
@@ -118,15 +135,17 @@ loop do
 				commands << :reselect
 				commands << :pager if truncated
 				commands << :back
+				command_opts = choices(options(commands))
 				command = nil
-				
+
+				view_cursor = 1
 				loop do
 					prompt.say("#{header} | Select -> #{node.class}")
 					prompt.say("===\n")
 					prompt.say(summary)
 					prompt.say("===\n")
 
-					command = prompt.select('Continue?', commands)
+					command, view_cursor = prompt.select('Continue?', command_opts, default: view_cursor, cycle: true)
 					system 'clear'
 
 					if command == :pager
@@ -151,7 +170,7 @@ loop do
 			curr = stack.pop
 		when :menu
 			commands = [:continue, :load, :exit]
-			command = prompt.select("#{header} | Menu", commands)
+			command = prompt.select("#{header} | Menu", commands, cycle: true)
 			system 'clear'
 
 			case command
