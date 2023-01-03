@@ -16,7 +16,7 @@ Alias the command in your [rc file](https://en.wikipedia.org/wiki/Configuration_
 echo 'alias cli-data-explorer="ruby ~/.173-tools/repos/data-explorer/main.rb"' >> ~/.zshrc
 ```
 
-You can now use the command in your shell:
+After restarting your shell, you can now use the command:
 ```shell
 cli-data-explorer
 ```
