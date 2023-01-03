@@ -1,6 +1,7 @@
 require 'open-uri'
 require 'tty-prompt'
-require 'tty-tree'
+#require 'tty-tree'
+require 'tty-pager'
 require 'awesome_print'
 
 require 'json'
@@ -14,6 +15,7 @@ parsers = {
 }
 
 prompt = TTY::Prompt.new
+pager = TTY::Pager.new
 
 loop do
 	mode = prompt.select("Explore with...", [:url, :data])
@@ -54,7 +56,7 @@ loop do
 	system 'clear'
 
 	# explore data
-	# TODO: sanitize strings in html content with str.dump
+	# TODO: sanitize strings in html content with str.dump (solving with awesome_print's #ai)
 
 	stack = []
 	curr = data
@@ -101,29 +103,55 @@ loop do
 				node, cursor = prompt.select("#{header} | Select", nodes, default: cursor, cycle: true, per_page: 10)
 				system 'clear'
 
-				if [Array, Hash].include? node.class
+				view = (node.class == String)? node : node.ai
+				lines = view.split("\n")
+				line_limit = 10
+				truncated = (lines.length > line_limit)
+				if truncated
+					summary = [*lines[0...line_limit], "(use pager to view #{lines.length - line_limit} more lines)"].join("\n")
+				else
+					summary = view
+				end
+
+				commands = []
+				commands << :select if [Array, Hash].include? node.class
+				commands << :reselect
+				commands << :pager if truncated
+				commands << :back
+				command = nil
+				
+				loop do
+					prompt.say("#{header} | Select -> #{node.class}")
+					prompt.say("===\n")
+					prompt.say(summary)
+					prompt.say("===\n")
+
+					command = prompt.select('Continue?', commands)
+					system 'clear'
+
+					if command == :pager
+						pager.page(view)
+					else
+						break
+					end
+				end
+
+				case command
+				when :select
 					stack.push curr
 					curr = node
 					break
-				else
-					prompt.say("#{header} | Select -> #{node.class}")
-					ap node
-					prompt.say("\n")
-					command = prompt.select('Continue?', [:select, :back])
-					system 'clear'
-
-					case command
-					when :select
-						next
-					when :back
-						break
-					end
+				when :reselect
+					next
+				when :back
+					break
 				end
 			end
 		when :back
 			curr = stack.pop
 		when :menu
-			command = prompt.select("#{header} | Menu", [:continue, :load, :exit])
+			commands = [:continue, :load, :exit]
+			command = prompt.select("#{header} | Menu", commands)
 			system 'clear'
 
 			case command
