@@ -45,7 +45,7 @@ loop do
 	loop do 
 		case mode
 		when :url
-			url = "https://example.com"#prompt.ask('url:')
+			url = prompt.ask('url:')
 			begin
 				raw = URI.open(url)
 			rescue
