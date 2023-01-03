@@ -106,6 +106,7 @@ loop do
 		leaf = nodes.empty?
 		root = stack.empty?
 		opts = []
+		opts << :view
 		opts << :select unless leaf
 		opts << :back unless root
 		opts << :menu
@@ -114,6 +115,8 @@ loop do
 		system 'clear'
 
 		case action
+		when :view
+			pager.page(curr.ai)
 		when :select
 			select_cursor = 1
 			loop do
