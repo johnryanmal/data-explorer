@@ -5,6 +5,7 @@ require 'tty-pager'
 require 'awesome_print'
 
 require 'json'
+require 'yaml'
 require 'nokogiri'
 require 'xml/to/hash'
 
@@ -29,7 +30,8 @@ end
 
 parsers = {
 	json: lambda {|raw| JSON.parse(raw)},
-	html: lambda {|raw| Nokogiri::HTML(raw).to_hash}
+	html: lambda {|raw| Nokogiri::HTML(raw).to_hash},
+	yaml: lambda {|raw| YAML.load(raw)}
 }
 
 prompt = TTY::Prompt.new
