@@ -30,8 +30,8 @@ end
 
 parsers = {
 	json: lambda {|raw| JSON.parse(raw)},
-	html: lambda {|raw| Nokogiri::HTML(raw).to_hash},
-	yaml: lambda {|raw| YAML.load(raw)}
+	yaml: lambda {|raw| YAML.load(raw)},
+	html: lambda {|raw| Nokogiri::HTML(raw).to_hash}
 }
 
 prompt = TTY::Prompt.new
@@ -80,7 +80,7 @@ loop do
 
 	stack = []
 	curr = data
-
+	action_cursor = 1
 	loop do
 		nodes = []
 		context = curr.class
@@ -107,13 +107,14 @@ loop do
 
 		leaf = nodes.empty?
 		root = stack.empty?
-		opts = []
-		opts << :view
-		opts << :select unless leaf
-		opts << :back unless root
-		opts << :menu
+		actions = []
+		actions << :select unless leaf
+		actions << :view
+		actions << :back unless root
+		actions << :menu
+		action_opts = choices(options(actions))
 
-		action = prompt.select("#{header} | Node", opts, cycle: true)
+		action, action_cursor = prompt.select("#{header} | Node", action_opts, default: action_cursor, cycle: true)
 		system 'clear'
 
 		case action
@@ -130,7 +131,7 @@ loop do
 				line_limit = 10
 				truncated = (lines.length > line_limit)
 				if truncated
-					summary = [*lines[0...line_limit], "(use pager to view #{lines.length - line_limit} more lines)"].join("\n")
+					summary = [*lines[0...line_limit], "(use view to see #{lines.length - line_limit} more lines)"].join("\n")
 				else
 					summary = view
 				end
@@ -138,7 +139,7 @@ loop do
 				commands = []
 				commands << :unselect
 				commands << :select if [Array, Hash].include? node.class
-				commands << :pager if truncated
+				commands << :view if truncated
 				commands << :back
 				command_opts = choices(options(commands))
 				command = nil
@@ -153,7 +154,7 @@ loop do
 					command, view_cursor = prompt.select('Continue?', command_opts, default: view_cursor, cycle: true)
 					system 'clear'
 
-					if command == :pager
+					if command == :view
 						pager.page(view)
 					else
 						break
