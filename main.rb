@@ -1,5 +1,18 @@
-require 'bundler/setup'
-Bundler.require
+require 'bundler/inline'
+
+gemfile do
+	source "https://rubygems.org"
+	
+	gem 'open-uri'
+	gem 'tty-prompt'
+	gem 'tty-pager'
+	gem 'awesome_print'
+
+	gem 'json'
+	gem 'yaml'
+	gem 'nokogiri'
+	gem 'xml-to-hash'
+end
 
 
 def options(array)
