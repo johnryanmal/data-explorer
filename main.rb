@@ -1,13 +1,5 @@
-require 'open-uri'
-require 'tty-prompt'
-#require 'tty-tree'
-require 'tty-pager'
-require 'awesome_print'
-
-require 'json'
-require 'yaml'
-require 'nokogiri'
-require 'xml/to/hash'
+require 'bundler/setup'
+Bundler.require
 
 
 def options(array)
