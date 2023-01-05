@@ -11,6 +11,7 @@ gemfile do
 
 	gem 'json'
 	gem 'yaml'
+	gem 'csv'
 	gem 'nokogiri'
 	gem 'xml-to-hash'
 end
@@ -38,7 +39,8 @@ end
 parsers = {
 	json: lambda {|raw| JSON.parse(raw)},
 	yaml: lambda {|raw| YAML.load(raw)},
-	html: lambda {|raw| Nokogiri::HTML(raw).to_hash}
+	html: lambda {|raw| Nokogiri::HTML(raw).to_hash},
+	csv: lambda {|raw| CSV.parse(raw)}
 }
 
 prompt = TTY::Prompt.new
