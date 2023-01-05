@@ -1,5 +1,6 @@
 require 'bundler/inline'
 
+puts "Loading..."
 gemfile do
 	source "https://rubygems.org"
 	
@@ -13,6 +14,7 @@ gemfile do
 	gem 'nokogiri'
 	gem 'xml-to-hash'
 end
+system 'clear'
 
 
 def options(array)
