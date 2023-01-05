@@ -47,8 +47,8 @@ prompt = TTY::Prompt.new
 pager = TTY::Pager.new
 
 loop do
-	mode = prompt.select("Explore with...", [:url, :data], filter: true)
-	parser = prompt.select("Using...", parsers.keys, filter: true)
+	mode = prompt.select("Explore with...", [:url, :input, :paste], filter: true)
+	parser = prompt.select("Formatted as...", parsers.keys, filter: true)
 	parse = parsers.fetch(parser, lambda {|raw| raw})
 	data = nil
 
@@ -65,8 +65,10 @@ loop do
 			else
 				prompt.ok('Accessed link.')
 			end
-		when :data
+		when :input
 			raw = prompt.multiline("#{parser}:").join
+		when :paste
+			raw = prompt.mask("#{parser}:", echo: false)
 		end
 
 		begin
