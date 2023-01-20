@@ -58,9 +58,11 @@ loop do
 		when :url
 			url = prompt.ask('url:')
 			begin
-				raw = URI.open(url)
+				raw = URI.open(url).read
 			rescue
 				prompt.error('Failed to access link.')
+				#p raw
+				#raise
 				next
 			else
 				prompt.ok('Accessed link.')
@@ -75,6 +77,7 @@ loop do
 			data = parse.call(raw)
 		rescue
 			prompt.error('Failed to parse data.')
+			#pp raw
 			#raise
 			next
 		else
