@@ -151,8 +151,8 @@ loop do
 				end
 
 				commands = []
-				commands << :unselect
 				commands << :select if [Array, Hash].include? node.class
+				commands << :unselect
 				commands << :view if truncated
 				commands << :back
 				command_opts = choices(options(commands))
