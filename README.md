@@ -6,14 +6,14 @@ A command-line interface for viewing and navigating nested data structures. Impo
 
 Clone the repository:
 ```shell
-git clone https://github.com/johnryanmal/data-explorer ~/.173-tools/repos/data-explorer
+git clone https://github.com/johnryanmal/data-explorer ~/data-explorer
 ```
 
 Alias the command in your [rc file](https://en.wikipedia.org/wiki/Configuration_file):
 
 `.zshrc`
 ```shell
-echo 'alias cli-data-explorer="ruby ~/.173-tools/repos/data-explorer/main.rb"' >> ~/.zshrc
+echo 'alias cli-data-explorer="ruby ~/data-explorer/main.rb"' >> ~/.zshrc
 ```
 
 After restarting your shell, you can now use the command:
@@ -25,5 +25,5 @@ cli-data-explorer
 
 Pull from the repository:
 ```
-git -C ~/.173-tools/repos/data-explorer pull origin main
+git -C ~/data-explorer pull origin main
 ```
